@@ -5,6 +5,6 @@ export default async function (fastify: FastifyInstance) {
   fastify.get('/', userController.getUsers)
   fastify.post('/', userController.newUser)
 
-  // TODO: PEGAR POR PARAMETRO
-  fastify.put('/', userController.update)
+  fastify.put('/:userId', userController.update)
+  fastify.delete('/:userId', userController.delete)
 }

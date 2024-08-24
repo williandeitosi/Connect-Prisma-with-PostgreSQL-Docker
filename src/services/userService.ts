@@ -19,9 +19,17 @@ export const findByEmail = async (email: string) => {
   })
 }
 
-export const updateUser = async (email: string, name: string) => {
+export const updateUser = async (id: number, email: string, name: string) => {
   return prisma.user.update({
-    where: { email },
+    where: { id },
     data: { email, name },
+  })
+}
+
+export const deleteUser = async (id: number) => {
+  return prisma.user.delete({
+    where: {
+      id,
+    },
   })
 }

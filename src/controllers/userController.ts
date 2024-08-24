@@ -36,15 +36,37 @@ export const newUser = async (request: FastifyRequest, reply: FastifyReply) => {
 }
 
 export const update = async (request: FastifyRequest, reply: FastifyReply) => {
-  // TODO: PEGAR POR PARAMETRO
-
+  const { userId } = request.params as { userId: string }
   const { email, name } = request.body as { email: string; name: string }
-  const emailExists = await userService.findByEmail(email)
 
-  if (!emailExists) {
-    reply.status(404).send({ error: 'Email not found' })
-  } else {
-    const editUser = await userService.updateUser(email, name)
-    reply.status(201).send(editUser)
+  const id = Number(userId)
+
+  if (isNaN(id)) {
+    return reply.status(400).send({ error: 'Invalid ID format' })
   }
+
+  try {
+    const editUser = await userService.updateUser(id, email, name)
+    if (!editUser) {
+      return reply.status(404).send({ error: 'User not found' })
+    }
+    return reply.status(200).send(editUser)
+  } catch (err) {
+    console.error('Error updating user:', err)
+    return reply.status(500).send({ error: 'Internal Server Error' })
+  }
+}
+
+
+export const delete = async (request: FastifyRequest, reply: FastifyReply) => {
+  const {userId} = request.params as {userId: string}
+
+  const id = Number(userId)
+
+  if(isNaN(id)){
+    return reply.status(400).send({ error: 'Invalid ID format' })
+    
+  }
+
+  // TODO continuar a logica para o delel de usuarios
 }
