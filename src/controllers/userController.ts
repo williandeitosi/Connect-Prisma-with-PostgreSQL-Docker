@@ -1,4 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import { userIdSchema, userSchema } from '../schemas/userSchemas'
 import * as userService from '../services/userService'
 
 export const getUsers = async (
@@ -15,7 +16,14 @@ export const getUsers = async (
 
 export const newUser = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    const { email, name } = request.body as { email: string; name: string }
+    const result = userSchema.safeParse(request.body)
+
+    if (!result.success)
+      return reply
+        .status(400)
+        .send({ error: 'Invalid input', details: result.error.errors })
+
+    const { email, name } = result.data
 
     const emailExists = await userService.findByEmail(email)
     if (!email || !name) {
@@ -36,10 +44,23 @@ export const newUser = async (request: FastifyRequest, reply: FastifyReply) => {
 }
 
 export const update = async (request: FastifyRequest, reply: FastifyReply) => {
-  const { userId } = request.params as { userId: string }
-  const { email, name } = request.body as { email: string; name: string }
+  const userResult = userSchema.safeParse(request.body)
+  if (!userResult.success) {
+    return reply
+      .status(400)
+      .send({ error: 'Invalid input', details: userResult.error.errors })
+  }
+  const { email, name } = userResult.data
 
-  const id = Number(userId)
+  const idResult = userIdSchema.safeParse(request.params)
+
+  if (!idResult.success) {
+    return reply
+      .status(400)
+      .send({ error: 'Invalid ID format', details: idResult.error.errors })
+  }
+
+  const id = Number(idResult.data?.userId)
 
   if (isNaN(id)) {
     return reply.status(400).send({ error: 'Invalid ID format' })
