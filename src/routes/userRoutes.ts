@@ -6,5 +6,5 @@ export default async function (fastify: FastifyInstance) {
   fastify.post('/', userController.newUser)
 
   fastify.put('/:userId', userController.update)
-  fastify.delete('/:userId', userController.delete)
+  fastify.delete('/:userId', userController.deleteUser)
 }

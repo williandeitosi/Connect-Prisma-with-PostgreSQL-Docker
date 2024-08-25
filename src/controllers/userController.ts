@@ -57,16 +57,20 @@ export const update = async (request: FastifyRequest, reply: FastifyReply) => {
   }
 }
 
-
-export const delete = async (request: FastifyRequest, reply: FastifyReply) => {
-  const {userId} = request.params as {userId: string}
+export const deleteUser = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { userId } = request.params as { userId: string }
 
   const id = Number(userId)
 
-  if(isNaN(id)){
-    return reply.status(400).send({ error: 'Invalid ID format' })
-    
-  }
+  if (isNaN(id)) return reply.status(400).send({ error: 'Invalid ID format' })
 
-  // TODO continuar a logica para o delel de usuarios
+  try {
+    await userService.deleteUser(id)
+    reply.status(200).send({ message: 'Accepted' })
+  } catch (err) {
+    reply.status(500).send({ error: 'No Content' })
+  }
 }
